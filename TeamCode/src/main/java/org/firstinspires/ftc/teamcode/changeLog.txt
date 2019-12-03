@@ -1,0 +1,9 @@
+Here's some stuff we need to change:
+
+Diameter of wheels
+
+Counts per revolution of each motor:
+    This will be different for each motor setup i.e: drive motors vs arm motors
+    Be sure to take into account the fact that the counts/rev for each motor is on the input motor, NOT THE OUTPUT.
+    Make a function to move the robot a certain distance
+        Probably same thing for the arm
