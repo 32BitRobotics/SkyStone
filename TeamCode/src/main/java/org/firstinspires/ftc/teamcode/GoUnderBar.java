@@ -7,19 +7,21 @@ public abstract class GoUnderBar extends OpBase {
 
     public abstract int sign();
 
+    public abstract void moreStuff();
+
     @Override
     public boolean runRobot() {
-        driveInches(12, 12, 0.2, 0.2);
+        //driveInches(12, 12, 0.2, 0.2);
 
         all.noEncoders();
 
         ElapsedTime et = new ElapsedTime();
 
-        /*all.setPower(0.2);
+        all.setPower(0.2);
         while (opModeIsActive() && et.milliseconds() < 1000);
         all.setPower(0);
         et.reset();
-        while (opModeIsActive() && et.milliseconds() < 200);*/
+        while (opModeIsActive() && et.milliseconds() < 200);
 
         leftFront.setPower(-0.5 * sign());
         leftBack.setPower(0.5 * sign());
@@ -29,6 +31,8 @@ public abstract class GoUnderBar extends OpBase {
         et.reset();
         while (opModeIsActive() && et.milliseconds() < 3000);
         all.setPower(0);
+
+        moreStuff();
 
         return false;
     }

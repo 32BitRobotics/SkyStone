@@ -9,4 +9,9 @@ public class GoUnderBarLeft extends GoUnderBar{
     public int sign() {
         return -1;
     }
+
+    @Override
+    public void moreStuff() {
+
+    }
 }

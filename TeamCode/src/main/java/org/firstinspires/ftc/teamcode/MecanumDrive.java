@@ -71,6 +71,7 @@ public class MecanumDrive extends OpBase{
 
         for (byte i = 0; i < 4; i++) { //check for clipping in each
             speeds[i]= Range.clip(speeds[i], -1.0, 1.0);
+            if (gamepad1.a) speeds[i] *= 0.3;
         }
 
         //power setting
@@ -94,9 +95,9 @@ public class MecanumDrive extends OpBase{
         }*/
 
         if (gamepad1.left_trigger > 0.5) {
-            claw.setPower(0.5);
+            claw.setPower(0.2);
         } else if (gamepad1.right_trigger > 0.5) {
-            claw.setPower(-0.5);
+            claw.setPower(-0.2);
         } else claw.setPower(0);
 
         //telemetry

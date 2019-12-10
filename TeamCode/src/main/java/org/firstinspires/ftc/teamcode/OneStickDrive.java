@@ -27,6 +27,11 @@ public class OneStickDrive extends OpBase {
             right /= max;
         }
 
+        if (gamepad1.a) {
+            left *= 0.3;
+            right *= 0.3;
+        }
+
         // Output the safe vales to the motor drives.
         this.left.setPower(left);
         this.right.setPower(right);
@@ -46,9 +51,9 @@ public class OneStickDrive extends OpBase {
         }*/
 
         if (gamepad1.left_trigger > 0) {
-            claw.setPower(0.5);
+            claw.setPower(0.2);
         } else if (gamepad1.right_trigger > 0) {
-            claw.setPower(-0.5);
+            claw.setPower(-0.2);
         } else claw.setPower(0);
 
         telemetry.clear();

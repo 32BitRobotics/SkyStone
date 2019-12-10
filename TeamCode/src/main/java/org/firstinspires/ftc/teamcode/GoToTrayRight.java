@@ -2,15 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name="Go Under Bar Right")
-public class GoUnderBarRight extends GoUnderBar {
+@Autonomous(name="Go To Tray (Right)")
+public class GoToTrayRight extends GoToTray {
     @Override
     public int sign() {
         return 1;
-    }
-
-    @Override
-    public void moreStuff() {
-
     }
 }
