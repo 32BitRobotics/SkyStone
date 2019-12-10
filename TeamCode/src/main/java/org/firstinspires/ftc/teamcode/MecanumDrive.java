@@ -35,16 +35,19 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 //Declare OpMode Name and Type
-@TeleOp(name="Mecanum Drive", group="Linear Opmode")
 
-public class MecanumDrive extends OpBase{
+
+public abstract class MecanumDrive extends OpBase{
 
     private ElapsedTime runtime = new ElapsedTime(); //internal clock
     private Toggle solenoidToggle = new Toggle();
+
+    protected abstract Gamepad armGamepad();
 
     @Override
     public boolean runRobot() {
@@ -80,9 +83,9 @@ public class MecanumDrive extends OpBase{
         this.leftBack.setPower(speeds[2]);
         this.rightBack.setPower(speeds[3]);
 
-        if (gamepad1.left_bumper)
+        if (armGamepad().left_bumper)
             this.arm.setPower(1);
-        else if (gamepad1.right_bumper)
+        else if (armGamepad().right_bumper)
             this.arm.setPower(-1);
         else
             this.arm.setPower(0);
@@ -94,9 +97,9 @@ public class MecanumDrive extends OpBase{
             this.solenoids.setPower(0);
         }*/
 
-        if (gamepad1.left_trigger > 0.5) {
+        if (armGamepad().left_trigger > 0.5) {
             claw.setPower(0.2);
-        } else if (gamepad1.right_trigger > 0.5) {
+        } else if (armGamepad().right_trigger > 0.5) {
             claw.setPower(-0.2);
         } else claw.setPower(0);
 
