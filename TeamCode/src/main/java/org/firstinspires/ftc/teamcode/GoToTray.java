@@ -13,5 +13,10 @@ public abstract class GoToTray extends GoUnderBar {
         ElapsedTime et = new ElapsedTime();
         while (opModeIsActive() && et.milliseconds() < 3000);
         all.setPower(0);
+
+        all.setPower(0.5);
+        et.reset();
+        while (opModeIsActive() && et.milliseconds() < 1000);
+        all.setPower(0);
     }
 }

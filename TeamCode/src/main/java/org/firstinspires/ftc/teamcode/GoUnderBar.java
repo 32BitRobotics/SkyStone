@@ -18,7 +18,7 @@ public abstract class GoUnderBar extends OpBase {
         ElapsedTime et = new ElapsedTime();
 
         all.setPower(0.2);
-        while (opModeIsActive() && et.milliseconds() < 1000);
+        while (opModeIsActive() && et.milliseconds() < 2250);
         all.setPower(0);
         et.reset();
         while (opModeIsActive() && et.milliseconds() < 200);
@@ -29,7 +29,7 @@ public abstract class GoUnderBar extends OpBase {
         rightBack.setPower(-0.5 * sign());
 
         et.reset();
-        while (opModeIsActive() && et.milliseconds() < 3000);
+        while (opModeIsActive() && et.milliseconds() < 2000);
         all.setPower(0);
 
         moreStuff();

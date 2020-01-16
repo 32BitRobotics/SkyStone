@@ -49,31 +49,43 @@ public abstract class RetrBlocks extends OpBase {
         while (!cameraManager.hasExec ^ opModeIsActive()); // xor
 
         boolean[] blocks = new boolean[5];
+        
         // read from camera, go until we can't go no more
         setMoveLeft(0.5);
         while (opModeIsActive() && !cameraManager.thresh_crosses[0] && !cameraManager.thresh_crosses[1]);
         all.setPower(0);
 
-        // move right until we see yellow in the right
-        ElapsedTime et2 = new ElapsedTime();
+        // find the block
         setMoveRight(0.5);
-        while (opModeIsActive() && !cameraManager.thresh_crosses[0] && cameraManager.thresh_crosses[1]);
+        while (opModeIsActive() && cameraManager.thresh_crosses[0] && cameraManager.thresh_crosses[1]);
         all.setPower(0);
 
-        // if more than 500m has passed, the first block is probably the black one
-        int currentPos = 0;
-        if (et2.milliseconds() >= 500) {
-            currentPos = 1;
-        } else {
-            // find the block
-            setMoveRight(0.5);
-            while (opModeIsActive() && !cameraManager.thresh_crosses[0]);
-            while (opModeIsActive() && cameraManager.thresh_crosses[0] && cameraManager.thresh_crosses[1]);
-            all.setPower(0);
-        }
+        // move forwards
+        all.setPower(0.5);
+        et.reset();
+        while (opModeIsActive() && et.milliseconds() < 500);
+        all.setPower(0);
 
-        // the block is on our right half
+        this.arm.setPower(0.3);
+        et.reset();
+        while (opModeIsActive() && et.milliseconds() < 500);
+        arm.setPower(0);
 
+        all.setPower(-0.5);
+        et.reset();
+        while (opModeIsActive() && et.milliseconds() < 500);
+        all.setPower(0);
+
+        double firstPos = getZ();
+        left.setPower(-0.5);
+        right.setPower(0.5);
+        while (opModeIsActive() && Math.abs(getZ() - firstPos) < 90);
+        all.setPower(0);
+
+        all.setPower(0.5);
+        et.reset();
+        while (opModeIsActive() && et.milliseconds() < 2000);
+        all.setPower(0);
 
         return false;
     }

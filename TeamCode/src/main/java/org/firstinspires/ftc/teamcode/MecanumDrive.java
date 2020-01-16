@@ -72,8 +72,10 @@ public abstract class MecanumDrive extends OpBase{
 
         Double[] speeds = {frontRightPower, frontLeftPower, backLeftPower, backRightPower}; //store speeds in array
 
+        double limit = gamepad1.y ? 1.0 : 0.5;
         for (byte i = 0; i < 4; i++) { //check for clipping in each
-            speeds[i]= Range.clip(speeds[i], -1.0, 1.0);
+
+            speeds[i]= Range.clip(speeds[i], -limit, limit);
             if (gamepad1.a) speeds[i] *= 0.3;
         }
 

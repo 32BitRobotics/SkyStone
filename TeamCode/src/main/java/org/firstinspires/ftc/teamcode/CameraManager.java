@@ -25,6 +25,7 @@ public final class CameraManager {
     CMPipeline pipeline;
     boolean[] thresh_crosses = new boolean[10];
     public boolean hasExec = false;
+    boolean floorSeen = true;
 
     public List<MatOfPoint> contourList;
 
@@ -53,6 +54,7 @@ public final class CameraManager {
         Mat stuffMat = new Mat();
         Mat rectanglesOnMat = new Mat();
         Mat resultMat = new Mat();
+        Mat grayTestMat = new Mat();
         public List<MatOfPoint> contourListList = new ArrayList<>();
 
         Rect[][] rects = new Rect[][] {
@@ -112,19 +114,23 @@ public final class CameraManager {
             threshold += 2000.0;
         }
 
-        double findYellowArea(Mat subarea) {
-            Imgproc.cvtColor(subarea, subarea, Imgproc.COLOR_RGB2YCrCb);
-            Core.extractChannel(subarea, subarea, 2);
-            Imgproc.threshold(subarea, subarea, 102, 225, Imgproc.THRESH_BINARY_INV);
-
+        double findArea(Mat thresholded) {
             List<MatOfPoint> contours = new ArrayList<>();
-            Imgproc.findContours(subarea, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(thresholded, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
             double area = 0.0;
             for (MatOfPoint pt : contours) {
                 area += Imgproc.contourArea(pt);
             }
             return area;
+        }
+
+        double findYellowArea(Mat subarea) {
+            Imgproc.cvtColor(subarea, subarea, Imgproc.COLOR_RGB2YCrCb);
+            Core.extractChannel(subarea, subarea, 2);
+            Imgproc.threshold(subarea, subarea, 102, 225, Imgproc.THRESH_BINARY_INV);
+
+            return findArea(subarea);
         }
 
         @Override
@@ -139,11 +145,22 @@ public final class CameraManager {
             for (Rect rect : rects[curRect]) {
                 double area = findYellowArea(input.submat(rect));
                 Imgproc.rectangle(resultMat, rect, area > threshold ? green : red, 10);
-                thresh_crosses[i++] = area < threshold;
+                thresh_crosses[i++] = area > threshold;
             }
 
             cm.thresh_crosses = thresh_crosses;
             cm.hasExec = true;
+
+            Rect grayDetect = new Rect(0, 430, 480, 210);
+            grayTestMat = input.submat(grayDetect);
+            Imgproc.cvtColor(grayTestMat, grayTestMat, Imgproc.COLOR_RGB2GRAY);
+            Core.extractChannel(grayTestMat, grayTestMat, 0);
+            Imgproc.threshold(grayTestMat, grayTestMat, 100, 200, Imgproc.THRESH_BINARY_INV);
+
+            cm.floorSeen = findArea(grayTestMat) > 16000;
+            Scalar yellow = new Scalar(0xFF, 0xFC, 0);
+            Scalar blue = new Scalar(0, 0, 255);
+            Imgproc.rectangle(resultMat, grayDetect, cm.floorSeen ? blue : yellow, -1);
 
             return resultMat;
 
