@@ -33,13 +33,64 @@ public abstract class OpBase extends LinearOpMode {
 
     public DcMotor arm;
 
-    public DcMotor leftClaw;
-    public DcMotor rightClaw;
-    public DcMotorList claw = new DcMotorList();
+    //public DcMotor leftClaw;
+    //public DcMotor rightClaw;
+    //public DcMotorList claw = new DcMotorList();
 
     public BNO055IMU gyro;
     Orientation lastAngles = new Orientation();
 
+    enum Side {
+        Quarry,
+        Build
+    }
+
+    enum Direction {
+        Left,
+        Right
+    }
+
+    enum MotorOrientation {
+        Forwards,
+        Backwards
+    }
+
+    public static int motorMultiplier(MotorOrientation orientation) {
+        return orientation == MotorOrientation.Forwards ? 1 : -1;
+    }
+
+    public static Direction reverse(Direction d) {
+        return d == Direction.Left ? Direction.Right : Direction.Left;
+    }
+
+    public static final double AutPower = 0.2;
+
+    public void runForMS(int ms,MotorOrientation orientation) {
+        all.setPower(AutPower * motorMultiplier(orientation));
+        ElapsedTime et = new ElapsedTime();
+        while (opModeIsActive() && et.milliseconds() < ms);
+        all.setPower(0);
+    }
+
+    public void runForMS(int ms) {
+        runForMS(ms, MotorOrientation.Forwards);
+    }
+
+    public void strafe(int ms, Direction direction) {
+        setStrafe(direction);
+
+        ElapsedTime et = new ElapsedTime();
+        while (opModeIsActive() && et.milliseconds() < ms);
+        all.setPower(0);
+    }
+
+    public void setStrafe(Direction direction) {
+        int sign = direction == Direction.Left ? -1 : 1;
+        leftFront.setPower(sign * AutPower * 2);
+        leftBack.setPower(-sign * AutPower * 2);
+        rightFront.setPower(-sign * AutPower * 2);
+        rightBack.setPower(sign * AutPower * 2);
+    }
 
     public CameraManager cameraManager;
     public TelemetryManager telemetryManager;
@@ -100,13 +151,13 @@ public abstract class OpBase extends LinearOpMode {
         solenoids.noEncoders();*/
 
         // setup claw
-        leftClaw = hardwareMap.dcMotor.get("leftClaw");
+        /*leftClaw = hardwareMap.dcMotor.get("leftClaw");
         rightClaw = hardwareMap.dcMotor.get("rightClaw");
         leftClaw.setDirection(DcMotorSimple.Direction.REVERSE);
         rightClaw.setDirection(DcMotorSimple.Direction.FORWARD);
         claw.add(leftClaw);
         claw.add(rightClaw);
-        claw.noEncoders();
+        claw.noEncoders();*/
 
         // initialize gyro
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

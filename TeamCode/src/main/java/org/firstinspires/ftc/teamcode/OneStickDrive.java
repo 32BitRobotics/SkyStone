@@ -50,11 +50,11 @@ public class OneStickDrive extends OpBase {
             this.solenoids.setPower(0);
         }*/
 
-        if (gamepad1.left_trigger > 0) {
+        /*if (gamepad1.left_trigger > 0) {
             claw.setPower(0.2);
         } else if (gamepad1.right_trigger > 0) {
             claw.setPower(-0.2);
-        } else claw.setPower(0);
+        } else claw.setPower(0);*/
 
         telemetry.clear();
         telemetry.addData("left power", leftFront.getPower());

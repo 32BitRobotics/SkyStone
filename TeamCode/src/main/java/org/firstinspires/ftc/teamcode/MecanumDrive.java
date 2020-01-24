@@ -99,11 +99,11 @@ public abstract class MecanumDrive extends OpBase{
             this.solenoids.setPower(0);
         }*/
 
-        if (armGamepad().left_trigger > 0.5) {
+        /*if (armGamepad().left_trigger > 0.5) {
             claw.setPower(0.2);
         } else if (armGamepad().right_trigger > 0.5) {
             claw.setPower(-0.2);
-        } else claw.setPower(0);
+        } else claw.setPower(0);*/
 
         //telemetry
         telemetry.addData("Status", "Running");
