@@ -86,11 +86,18 @@ public abstract class MecanumDrive extends OpBase{
         this.rightBack.setPower(speeds[3]);
 
         if (armGamepad().left_bumper)
-            this.arm.setPower(1);
+            this.arm.setPower(0.5);
         else if (armGamepad().right_bumper)
-            this.arm.setPower(-1);
+            this.arm.setPower(-0.5);
         else
             this.arm.setPower(0);
+
+        if (gamepad1.left_trigger > 0.5)
+            this.lift.setPower(0.5);
+        else if (gamepad1.right_trigger > 0.5)
+            this.lift.setPower(-0.5);
+        else
+            this.lift.setPower(0);
 
         /*solenoidToggle.setInput(gamepad1.x);
         if (solenoidToggle.getValue()) {

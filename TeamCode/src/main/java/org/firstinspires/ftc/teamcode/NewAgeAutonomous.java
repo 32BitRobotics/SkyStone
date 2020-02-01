@@ -27,8 +27,8 @@ public abstract class NewAgeAutonomous extends OpBase {
         runForMS(1700);
 
         // strafe far enough that we can reach the tray
-        int strafeDuration = startingSide() == Side.Quarry ? 10000 : 1000;
-        strafe(strafeDuration, initMoveDirection());
+        int strafeDuration = startingSide() == Side.Quarry ? 10000 : 950;
+        strafe((int)(strafeDuration), initMoveDirection());
 
         // all the way to the tray
         runForMS(500);
@@ -37,10 +37,12 @@ public abstract class NewAgeAutonomous extends OpBase {
         arm.setPower(0.5);
         et.reset();
         while (opModeIsActive() && et.milliseconds() < 500);
-        arm.setPower(0);
 
         // go backwards for as much time as we have gone forwards
-        runForMS(500 + 1700, MotorOrientation.Backwards);
+        runForMS(1600, MotorOrientation.Backwards, AutPower * 2);
+
+        et.reset();
+        while (opModeIsActive() && et.milliseconds() < 2000);
 
         // pull the arm up
         arm.setPower(-0.5);
@@ -48,9 +50,12 @@ public abstract class NewAgeAutonomous extends OpBase {
         while (opModeIsActive() && et.milliseconds() < 500);
         arm.setPower(0);
 
-        // strafe to the opposite of the initial direction until we're not overlapping the tray anymore
-        strafe(2000, reverse(initMoveDirection()));
 
+        // strafe to the opposite of the initial direction until we're not overlapping the tray anymore
+        strafe((int)(2500), reverse(initMoveDirection()));
+        gyroTurn(reverse(initMoveDirection()), 0, AutPower);
+
+        /*
         // go forwards again so we don't collide with our partner
         runForMS(1700);
 
@@ -58,6 +63,9 @@ public abstract class NewAgeAutonomous extends OpBase {
         // This is a total guess, I have no faith in this number. Please fine tune it.
         strafe(3000, reverse(initMoveDirection()));
 
+:w
+
+         */
         return false;
     }
 }

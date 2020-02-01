@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -32,12 +33,13 @@ public abstract class OpBase extends LinearOpMode {
     public DcMotorList all;
 
     public DcMotor arm;
+    public DcMotor lift;
 
     //public DcMotor leftClaw;
     //public DcMotor rightClaw;
     //public DcMotorList claw = new DcMotorList();
 
-    public BNO055IMU gyro;
+    public GyroSensor gyro;
     Orientation lastAngles = new Orientation();
 
     enum Side {
@@ -65,31 +67,64 @@ public abstract class OpBase extends LinearOpMode {
 
     public static final double AutPower = 0.2;
 
-    public void runForMS(int ms,MotorOrientation orientation) {
-        all.setPower(AutPower * motorMultiplier(orientation));
+    public void runForMS(int ms, MotorOrientation orientation, double power) {
+        all.setPower(power * motorMultiplier(orientation));
         ElapsedTime et = new ElapsedTime();
         while (opModeIsActive() && et.milliseconds() < ms);
         all.setPower(0);
+    }
+
+    public void runForMS(int ms,MotorOrientation orientation) {
+       runForMS(ms, orientation, AutPower);
     }
 
     public void runForMS(int ms) {
         runForMS(ms, MotorOrientation.Forwards);
     }
 
-    public void strafe(int ms, Direction direction) {
-        setStrafe(direction);
+
+
+    public void strafe(int ms, Direction direction, double power) {
+        setStrafe(direction, power);
 
         ElapsedTime et = new ElapsedTime();
         while (opModeIsActive() && et.milliseconds() < ms);
         all.setPower(0);
     }
 
-    public void setStrafe(Direction direction) {
+    public void strafe(int ms, Direction direction) {
+        strafe(ms, direction, AutPower * 2);
+    }
+
+    public void setStrafe(Direction direction, double power) {
         int sign = direction == Direction.Left ? -1 : 1;
-        leftFront.setPower(sign * AutPower * 2);
-        leftBack.setPower(-sign * AutPower * 2);
-        rightFront.setPower(-sign * AutPower * 2);
-        rightBack.setPower(sign * AutPower * 2);
+        leftFront.setPower(sign * power);
+        leftBack.setPower(-sign * power * (direction == Direction.Right ? 0.90 : 0.85));
+        rightFront.setPower(-sign * power);
+        rightBack.setPower(sign * power);
+    }
+
+    static final double turnTimeout = 5000;
+
+    public void gyroTurn(Direction direction, double angle, double power) {
+        return;
+        /*
+        int sign = direction == Direction.Left ? -1 : 1;
+        left.setPower(sign * power);
+        right.setPower(-sign * power);
+        ElapsedTime et = new ElapsedTime();
+
+        while (opModeIsActive() && et.milliseconds() < turnTimeout) {
+            if (sign == -1 && gyro.rawZ() > angle) break;
+            else if (sign == 1 && gyro.rawZ() < angle) break;
+        }
+        all.setPower(0);
+
+         */
+    }
+
+    public void setStrafe(Direction direction) {
+        setStrafe(direction, AutPower * 2);
     }
 
     public CameraManager cameraManager;
@@ -135,12 +170,14 @@ public abstract class OpBase extends LinearOpMode {
         all.addAll(left);
         all.addAll(right);
 
-        if (isAutonomous()) { all.resetEncoders(); all.withEncoders(); }
-        else all.noEncoders();
+        //if (isAutonomous()) { all.resetEncoders(); all.withEncoders(); }
+        /*else*/ all.noEncoders();
 
         // initialize arm
         arm = hardwareMap.dcMotor.get("arm");
         arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift = hardwareMap.dcMotor.get("lift");
+        left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // initialize solenoids
         /*leftSolenoid = hardwareMap.dcMotor.get("leftSolenoid");
@@ -160,7 +197,7 @@ public abstract class OpBase extends LinearOpMode {
         claw.noEncoders();*/
 
         // initialize gyro
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        /*BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
@@ -169,7 +206,10 @@ public abstract class OpBase extends LinearOpMode {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         gyro = hardwareMap.get(BNO055IMU.class, "imu");
-        gyro.initialize(parameters);
+        gyro.initialize(parameters);*/
+        //gyro = hardwareMap.gyroSensor.get("gyro");
+        //gyro.calibrate();
+        //gyro.resetZAxisIntegrator();
 
         // initialize camera
         cameraManager = new CameraManager(hardwareMap.appContext);
@@ -382,7 +422,7 @@ public abstract class OpBase extends LinearOpMode {
         lastAngles = angles;
 
         return globalAngle;*/
-        return gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES).firstAngle;
+        return 0;
     }
 
     public void mecanumDrive(double x, double y, double turn) { /** Mecanum Drive System */
