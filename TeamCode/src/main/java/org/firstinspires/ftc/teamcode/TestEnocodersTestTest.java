@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name="Test Motor Named \"Test\"")
 public class TestEnocodersTestTest extends LinearOpMode {
     DcMotor motor;
 

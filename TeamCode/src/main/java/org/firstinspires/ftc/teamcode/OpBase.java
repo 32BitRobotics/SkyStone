@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -34,6 +36,9 @@ public abstract class OpBase extends LinearOpMode {
 
     public DcMotor arm;
     public DcMotor lift;
+
+    public ColorSensor color;
+    public DistanceSensor distance;
 
     //public DcMotor leftClaw;
     //public DcMotor rightClaw;
@@ -65,13 +70,19 @@ public abstract class OpBase extends LinearOpMode {
         return d == Direction.Left ? Direction.Right : Direction.Left;
     }
 
-    public static final double AutPower = 0.2;
+    public static final double AutPower = 0.23;
 
     public void runForMS(int ms, MotorOrientation orientation, double power) {
         all.setPower(power * motorMultiplier(orientation));
         ElapsedTime et = new ElapsedTime();
         while (opModeIsActive() && et.milliseconds() < ms);
         all.setPower(0);
+
+        telemetry.clear();
+        telemetry.addData("Red", color.red());
+        telemetry.addData("Green", color.green());
+        telemetry.addData("Blue", color.blue());
+        telemetry.update();
     }
 
     public void runForMS(int ms,MotorOrientation orientation) {
@@ -104,6 +115,19 @@ public abstract class OpBase extends LinearOpMode {
         rightBack.setPower(sign * power);
     }
 
+    public void timeTurn(int ms, Direction direction, double power) {
+        int sign = direction == Direction.Left ? -1 : 1;
+        left.setPower(sign * power);
+        right.setPower(-sign * power);
+        ElapsedTime et = new ElapsedTime();
+        while (opModeIsActive() && et.milliseconds() < ms);
+        all.setPower(0);
+    }
+
+    public void timeTurn(int ms, Direction direction) {
+        timeTurn(ms, direction, AutPower * 0.75);
+    }
+
     static final double turnTimeout = 5000;
 
     public void gyroTurn(Direction direction, double angle, double power) {
@@ -133,11 +157,12 @@ public abstract class OpBase extends LinearOpMode {
     public abstract boolean runRobot();
     public abstract boolean isAutonomous();
 
-    static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
+    static final double     COUNTS_PER_MOTOR_REV    = 2240  ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 0.36 * .6 * (22.0/26.0) ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.atan(1) * 4);
+    static final double WHEEL_CIRCUMFERENCE = 12.75 * Math.atan(1) * 4 * 2;
 
     // These constants define the desired driving/control characteristics
     // The can/should be tweaked to suite the specific robot drive train.
@@ -214,13 +239,19 @@ public abstract class OpBase extends LinearOpMode {
         // initialize camera
         cameraManager = new CameraManager(hardwareMap.appContext);
 
+        // initialize color sensor
+        color = (ColorSensor)hardwareMap.get("color");
+        distance = (DistanceSensor)hardwareMap.get("distance");
+
         // initialize telemetry
         //if (!isAutonomous())
         //  telemetryManager = new TelemetryManager(this);
 
         waitForStart();
 
-        if (this.isAutonomous()) runRobot();
+        if (this.isAutonomous()) {
+            runRobot();
+        }
         else while (opModeIsActive() && runRobot());
     }
 
