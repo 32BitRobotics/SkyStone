@@ -51,12 +51,14 @@ public abstract class FindCorrectBlock extends OpBase {
         all.noEncoders();
         setStrafe(initDirection());
         et.reset();
-        while (opModeIsActive() && color.red() > r && color.green() > g && color.blue() > b) {
-            telemetry.clear();
-            telemetry.addData("Red", color.red());
-            telemetry.addData("Green", color.green());
-            telemetry.addData("Blue", color.blue());
-            telemetry.update();
+        if (color.red() > r && color.green() > g && color.blue() > b) {
+            while (opModeIsActive() && color.red() > r && color.green() > g && color.blue() > b) {
+                telemetry.clear();
+                telemetry.addData("Red", color.red());
+                telemetry.addData("Green", color.green());
+                telemetry.addData("Blue", color.blue());
+                telemetry.update();
+            }
         }
 
         double strafeTime = et.milliseconds();
@@ -88,10 +90,20 @@ public abstract class FindCorrectBlock extends OpBase {
             encoderDrive(AutPower * 2, 48, 48, 12);
         }
 
+        lift.setPower(0.5);
+        et.reset();
+        while (opModeIsActive() && et.milliseconds() < 1000);
+        lift.setPower(0);
+
         arm.setPower(-0.5);
         et.reset();
-        while (opModeIsActive() && et.milliseconds() < 400);
+        while (opModeIsActive() && et.milliseconds() < 200);
         arm.setPower(0);
+
+        lift.setPower(-0.5);
+        et.reset();
+        while (opModeIsActive() && et.milliseconds() < 1000);
+        lift.setPower(0);
 
         encoderDrive(AutPower * 2, -13, -13, 10);
 
